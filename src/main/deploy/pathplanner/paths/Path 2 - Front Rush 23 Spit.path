@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -95,18 +95,15 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 2.0,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
+      "rotationDegrees": 180.0
     },
     {
       "waypointRelativePos": 3,
-      "rotationDegrees": -156.0,
-      "rotateFast": false
+      "rotationDegrees": -156.0
     },
     {
       "waypointRelativePos": 4.0,
-      "rotationDegrees": 160.0,
-      "rotateFast": false
+      "rotationDegrees": 160.0
     }
   ],
   "constraintZones": [
@@ -118,14 +115,36 @@
         "maxVelocity": 3.0,
         "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
       }
     }
   ],
+  "pointTowardsZones": [],
   "eventMarkers": [
+    {
+      "name": "StopFeeder",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stopFeeder"
+              }
+            }
+          ]
+        }
+      }
+    },
     {
       "name": "Intake",
       "waypointRelativePos": 0.5,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -143,6 +162,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 0.5,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -160,6 +180,7 @@
     {
       "name": "Launch",
       "waypointRelativePos": 1.7999999999999998,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -177,6 +198,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 2.3499999999999996,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -200,6 +222,7 @@
     {
       "name": "Intake",
       "waypointRelativePos": 2.3499999999999996,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -215,8 +238,27 @@
       }
     },
     {
+      "name": "StopFeeder",
+      "waypointRelativePos": 3.4499999999999997,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stopFeeder"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "Intake",
       "waypointRelativePos": 3.5999999999999996,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -234,6 +276,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 3.5999999999999996,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -251,6 +294,7 @@
     {
       "name": "Launch",
       "waypointRelativePos": 4.95,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -264,58 +308,25 @@
           ]
         }
       }
-    },
-    {
-      "name": "StopFeeder",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "stopFeeder"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "StopFeeder",
-      "waypointRelativePos": 3.4499999999999997,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "stopFeeder"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 6.0,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -167.5,
-    "rotateFast": false
+    "rotation": -167.5
   },
   "reversed": false,
-  "folder": "Front Paths",
-  "previewStartingState": {
-    "rotation": 180.0,
-    "velocity": 0
+  "folder": "Comp",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

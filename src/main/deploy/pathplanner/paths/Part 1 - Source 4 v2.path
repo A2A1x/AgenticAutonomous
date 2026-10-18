@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -47,15 +47,16 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": 150.0,
-      "rotateFast": false
+      "rotationDegrees": 150.0
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Intake",
       "waypointRelativePos": 0.45,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -73,6 +74,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 0.6,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -90,6 +92,7 @@
     {
       "name": "AlignToSpeaker",
       "waypointRelativePos": 1.6,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -109,18 +112,19 @@
     "maxVelocity": 6.0,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 137.5,
-    "rotateFast": false
+    "rotation": 137.5
   },
   "reversed": false,
-  "folder": "Source Paths",
-  "previewStartingState": {
-    "rotation": 120.0,
-    "velocity": 0
+  "folder": "Comp",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 120.0
   },
   "useDefaultConstraints": true
 }

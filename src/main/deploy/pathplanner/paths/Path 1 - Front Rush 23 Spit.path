@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5199999999999998,
+        "x": 1.67,
         "y": 5.55
       },
       "isLocked": false,
@@ -79,25 +79,24 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.45,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
+      "rotationDegrees": 180.0
     },
     {
       "waypointRelativePos": 2.0,
-      "rotationDegrees": 130.0,
-      "rotateFast": false
+      "rotationDegrees": 130.0
     },
     {
       "waypointRelativePos": 2.9,
-      "rotationDegrees": 115.0,
-      "rotateFast": false
+      "rotationDegrees": 115.0
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "LaunchReady",
       "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -115,6 +114,7 @@
     {
       "name": "Launch",
       "waypointRelativePos": 0.45,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -132,6 +132,7 @@
     {
       "name": "Intake",
       "waypointRelativePos": 0.55,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -149,6 +150,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 0.55,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -166,6 +168,7 @@
     {
       "name": "StopFeeder",
       "waypointRelativePos": 1.3,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -183,6 +186,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 1.7,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -200,6 +204,7 @@
     {
       "name": "Launch",
       "waypointRelativePos": 1.7,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -217,6 +222,7 @@
     {
       "name": "StopFeeder",
       "waypointRelativePos": 2.8,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -234,6 +240,7 @@
     {
       "name": "Intake",
       "waypointRelativePos": 2.85,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -251,6 +258,7 @@
     {
       "name": "LaunchReady",
       "waypointRelativePos": 2.85,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -270,18 +278,19 @@
     "maxVelocity": 6.0,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
-    "rotateFast": false
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Front Paths",
-  "previewStartingState": {
-    "rotation": 180.0,
-    "velocity": 0
+  "folder": "Comp",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
