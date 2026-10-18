@@ -3,6 +3,7 @@ import 'package:pathplanner/auto/pathplanner_auto.dart';
 import 'package:pathplanner/path/choreo_path.dart';
 import 'package:pathplanner/path/pathplanner_path.dart';
 import 'package:pathplanner/services/pplib_telemetry.dart';
+import 'package:pathplanner/util/wpimath/geometry.dart';
 import 'package:pathplanner/widgets/conditional_widget.dart';
 import 'package:pathplanner/widgets/custom_appbar.dart';
 import 'package:pathplanner/widgets/editor/split_auto_editor.dart';
@@ -63,11 +64,43 @@ class _AutoEditorPageState extends State<AutoEditorPage> {
             .toList()
         : [];
 
+    Set<String> fadedNames = widget.auto
+        .getAllPathNames(allOptions: true)
+        .toSet()
+        .difference(autoPathNames.toSet());
+    Map<String, ({Pose2d start, Pose2d end})> pathEnds = widget.auto.choreoAuto
+        ? {
+            for (ChoreoPath p in widget.allChoreoPaths)
+              if (p.trajectory.states.isNotEmpty)
+                p.name: (
+                  start: p.trajectory.states.first.pose,
+                  end: p.trajectory.states.last.pose
+                ),
+          }
+        : {
+            for (PathPlannerPath p in widget.allPaths)
+              p.name: (
+                start: Pose2d(
+                    p.pathPoints.first.position, p.idealStartingState.rotation),
+                end:
+                    Pose2d(p.pathPoints.last.position, p.goalEndState.rotation),
+              ),
+          };
+
     final editorWidget = SplitAutoEditor(
       prefs: widget.prefs,
       auto: widget.auto,
       autoPaths: autoPaths,
       autoChoreoPaths: autoChoreoPaths,
+      fadedPaths: widget.auto.choreoAuto
+          ? []
+          : widget.allPaths.where((p) => fadedNames.contains(p.name)).toList(),
+      fadedChoreoPaths: widget.auto.choreoAuto
+          ? widget.allChoreoPaths
+              .where((p) => fadedNames.contains(p.name))
+              .toList()
+          : [],
+      decisionWarnings: widget.auto.getDecisionWarnings(pathEnds),
       allPathNames: widget.allPathNames,
       fieldImage: widget.fieldImage,
       undoStack: widget.undoStack,

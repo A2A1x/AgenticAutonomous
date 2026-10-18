@@ -21,6 +21,9 @@ class PathPainter extends CustomPainter {
   final ColorScheme colorScheme;
   final List<PathPlannerPath> paths;
   final List<ChoreoPath> choreoPaths;
+  // Paths in non-default decision options, drawn faded
+  final List<PathPlannerPath> fadedPaths;
+  final List<ChoreoPath> fadedChoreoPaths;
   final FieldImage fieldImage;
   final bool simple;
   final bool hideOtherPathsOnHover;
@@ -50,6 +53,8 @@ class PathPainter extends CustomPainter {
     required this.colorScheme,
     required this.paths,
     this.choreoPaths = const [],
+    this.fadedPaths = const [],
+    this.fadedChoreoPaths = const [],
     required this.fieldImage,
     this.simple = false,
     this.hideOtherPathsOnHover = false,
@@ -97,6 +102,34 @@ class PathPainter extends CustomPainter {
 
     _paintGrid(
         canvas, size, prefs.getBool(PrefsKeys.showGrid) ?? Defaults.showGrid);
+
+    for (PathPlannerPath path in fadedPaths) {
+      if (hideOtherPathsOnHover &&
+          hoveredPath != null &&
+          hoveredPath != path.name) {
+        continue;
+      }
+      _paintPathPoints(
+          path,
+          canvas,
+          (hoveredPath == path.name)
+              ? Colors.orange
+              : colorScheme.secondary.withAlpha(80));
+    }
+    for (ChoreoPath path in fadedChoreoPaths) {
+      if ((hideOtherPathsOnHover &&
+              hoveredPath != null &&
+              hoveredPath != path.name) ||
+          path.trajectory.states.isEmpty) {
+        continue;
+      }
+      _paintTrajectory(
+          path.trajectory,
+          canvas,
+          (hoveredPath == path.name)
+              ? Colors.orange
+              : colorScheme.secondary.withAlpha(80));
+    }
 
     for (int i = 0; i < paths.length; i++) {
       if (hideOtherPathsOnHover &&

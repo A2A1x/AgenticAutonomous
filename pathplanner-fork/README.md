@@ -3,6 +3,18 @@
 [![PathPlannerLib](https://github.com/mjansen4857/pathplanner/actions/workflows/pplib-ci.yml/badge.svg)](https://github.com/mjansen4857/pathplanner/actions/workflows/pplib-ci.yml)
 
 # PathPlanner
+
+> **Local fork of v2026.1.2, tracked as plain files in the AgenticAutonomous repo: decision nodes in autos.**
+> An auto can contain a `"decision"` command
+> (`{name, timeout, defaultOption, options: [{name, commands}]}`) that picks one pre-drawn option
+> on the robot at runtime. In Java, register a decider with `Decisions.register(name, decider)`.
+> It returns an option index, or -1 while undecided. A `decide:<name>` event marker locks the
+> choice early, and `PathPlannerLogging.setLogDecisionCallback` reports each outcome. Path lists
+> and the starting pose follow the default option.
+>
+> Only the Java PathPlannerLib understands decision nodes. **The C++ and Python libs can't
+> parse them** and silently skip the whole node, including every option's commands.
+
 <a href="https://www.microsoft.com/en-us/p/frc-pathplanner/9nqbkb5dw909?cid=storebadge&ocid=badge&rtc=1&activetab=pivot:overviewtab"><img src="https://mjansen4857.com/badges/windows.svg" height=50></a>
 &nbsp;&nbsp;&nbsp;
 

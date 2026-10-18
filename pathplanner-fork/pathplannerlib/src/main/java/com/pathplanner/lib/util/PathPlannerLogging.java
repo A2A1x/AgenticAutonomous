@@ -1,5 +1,6 @@
 package com.pathplanner.lib.util;
 
+import com.pathplanner.lib.auto.Decisions;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class PathPlannerLogging {
   private static Consumer<Pose2d> logCurrentPose = null;
   private static Consumer<Pose2d> logTargetPose = null;
   private static Consumer<List<Pose2d>> logActivePath = null;
+  private static Consumer<Decisions.Outcome> logDecision = null;
 
   /**
    * Set the logging callback for the current robot pose
@@ -42,11 +44,22 @@ public class PathPlannerLogging {
     PathPlannerLogging.logActivePath = logActivePath;
   }
 
+  /**
+   * Set the logging callback for decision outcomes
+   *
+   * @param logDecision Consumer that accepts the outcome each time a decision node picks an option.
+   *     Can be null to disable logging this value.
+   */
+  public static void setLogDecisionCallback(Consumer<Decisions.Outcome> logDecision) {
+    PathPlannerLogging.logDecision = logDecision;
+  }
+
   /** Disables all logging callbacks registered by this class. */
   public static void clearLoggingCallbacks() {
     PathPlannerLogging.setLogCurrentPoseCallback(null);
     PathPlannerLogging.setLogTargetPoseCallback(null);
     PathPlannerLogging.setLogActivePathCallback(null);
+    PathPlannerLogging.setLogDecisionCallback(null);
   }
 
   /**
@@ -83,6 +96,17 @@ public class PathPlannerLogging {
       } else {
         logActivePath.accept(new ArrayList<>());
       }
+    }
+  }
+
+  /**
+   * Log a decision outcome. This is used internally.
+   *
+   * @param outcome The decision outcome
+   */
+  public static void logDecision(Decisions.Outcome outcome) {
+    if (logDecision != null) {
+      logDecision.accept(outcome);
     }
   }
 }

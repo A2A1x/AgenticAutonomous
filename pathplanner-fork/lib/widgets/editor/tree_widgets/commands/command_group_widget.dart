@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pathplanner/commands/command.dart';
 import 'package:pathplanner/commands/command_groups.dart';
+import 'package:pathplanner/commands/decision_command.dart';
 import 'package:pathplanner/commands/named_command.dart';
 import 'package:pathplanner/commands/path_command.dart';
 import 'package:pathplanner/commands/wait_command.dart';
 import 'package:pathplanner/widgets/conditional_widget.dart';
 import 'package:pathplanner/widgets/editor/tree_widgets/commands/add_command_button.dart';
+import 'package:pathplanner/widgets/editor/tree_widgets/commands/decision_command_widget.dart';
 import 'package:pathplanner/widgets/editor/tree_widgets/commands/duplicate_command_button.dart';
 import 'package:pathplanner/widgets/editor/tree_widgets/commands/named_command_widget.dart';
 import 'package:pathplanner/widgets/editor/tree_widgets/commands/path_command_widget.dart';
@@ -24,6 +26,7 @@ class CommandGroupWidget extends StatelessWidget {
   final VoidCallback? onDuplicateCommand;
   final bool showEditPathButton;
   final Function(String?)? onEditPathPressed;
+  final Widget? title;
 
   const CommandGroupWidget({
     super.key,
@@ -38,6 +41,7 @@ class CommandGroupWidget extends StatelessWidget {
     this.onDuplicateCommand,
     this.showEditPathButton = true,
     this.onEditPathPressed,
+    this.title,
   });
 
   @override
@@ -51,55 +55,57 @@ class CommandGroupWidget extends StatelessWidget {
       children: [
         Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Material(
-                color: Colors.transparent,
-                child: ConditionalWidget(
-                  condition: onGroupTypeChanged != null,
-                  falseChild:
-                      Text('$type Group', style: const TextStyle(fontSize: 16)),
-                  trueChild: PopupMenuButton(
-                    initialValue: command.type,
-                    tooltip: '',
-                    elevation: 12.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    onSelected: onGroupTypeChanged,
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 'sequential',
-                        child: Text('Sequential Group'),
+            if (title != null) Flexible(child: title!),
+            if (title == null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Material(
+                  color: Colors.transparent,
+                  child: ConditionalWidget(
+                    condition: onGroupTypeChanged != null,
+                    falseChild: Text('$type Group',
+                        style: const TextStyle(fontSize: 16)),
+                    trueChild: PopupMenuButton(
+                      initialValue: command.type,
+                      tooltip: '',
+                      elevation: 12.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      PopupMenuItem(
-                        value: 'parallel',
-                        child: Text('Parallel Group'),
-                      ),
-                      PopupMenuItem(
-                        value: 'deadline',
-                        child: Text('Deadline Group'),
-                      ),
-                      PopupMenuItem(
-                        value: 'race',
-                        child: Text('Race Group'),
-                      ),
-                    ],
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('$type Group',
-                              style: const TextStyle(fontSize: 16)),
-                          const Icon(Icons.arrow_drop_down),
-                        ],
+                      onSelected: onGroupTypeChanged,
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: 'sequential',
+                          child: Text('Sequential Group'),
+                        ),
+                        PopupMenuItem(
+                          value: 'parallel',
+                          child: Text('Parallel Group'),
+                        ),
+                        PopupMenuItem(
+                          value: 'deadline',
+                          child: Text('Deadline Group'),
+                        ),
+                        PopupMenuItem(
+                          value: 'race',
+                          child: Text('Race Group'),
+                        ),
+                      ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('$type Group',
+                                style: const TextStyle(fontSize: 16)),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
             Expanded(child: Container()),
             AddCommandButton(
               allowPathCommand: allPathNames != null,
@@ -255,6 +261,19 @@ class CommandGroupWidget extends StatelessWidget {
         onUpdated: onUpdated,
         onRemoved: () => _removeCommand(cmdIndex),
         undoStack: undoStack,
+        onDuplicateCommand: () => _duplicateCommand(cmdIndex),
+      );
+    } else if (command.commands[cmdIndex] is DecisionCommand) {
+      return DecisionCommandWidget(
+        command: command.commands[cmdIndex] as DecisionCommand,
+        undoStack: undoStack,
+        subCommandElevation: (subCommandElevation == 1.0) ? 4.0 : 1.0,
+        onUpdated: onUpdated,
+        onRemoved: () => _removeCommand(cmdIndex),
+        allPathNames: allPathNames,
+        onPathCommandHovered: onPathCommandHovered,
+        showEditPathButton: showEditPathButton,
+        onEditPathPressed: onEditPathPressed,
         onDuplicateCommand: () => _duplicateCommand(cmdIndex),
       );
     } else if (command.commands[cmdIndex] is CommandGroup) {

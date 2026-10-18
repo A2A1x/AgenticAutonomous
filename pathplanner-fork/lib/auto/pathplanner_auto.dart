@@ -5,9 +5,11 @@ import 'package:path/path.dart';
 import 'package:pathplanner/commands/named_command.dart';
 import 'package:pathplanner/commands/command.dart';
 import 'package:pathplanner/commands/command_groups.dart';
+import 'package:pathplanner/commands/decision_command.dart';
 import 'package:pathplanner/commands/path_command.dart';
 import 'package:pathplanner/pages/project/project_page.dart';
 import 'package:pathplanner/services/log.dart';
+import 'package:pathplanner/util/wpimath/geometry.dart';
 
 const String fileVersion = '2025.0';
 
@@ -166,14 +168,86 @@ class PathPlannerAuto {
         }
       }
 
+      if (cmd is DecisionCommand) {
+        ProjectPage.events.add('decide:${cmd.name}');
+      }
+
       if (cmd is CommandGroup) {
         _addNamedCommandsToEvents(cmd.commands);
       }
     }
   }
 
-  List<String> getAllPathNames() {
-    return _getPathNamesInCommands(sequence.commands);
+  /// Paths in the order they run, following each decision's default option.
+  /// With [allOptions], paths in every decision option are included too.
+  List<String> getAllPathNames({bool allOptions = false}) {
+    return _getPathNamesInCommands(sequence.commands, allOptions);
+  }
+
+  /// Warnings for decision options that don't line up with the rest of the
+  /// auto. [ends] maps path names to the poses where they start and end.
+  List<String> getDecisionWarnings(
+      Map<String, ({Pose2d start, Pose2d end})> ends) {
+    List<String> warnings = [];
+    Pose2d? lastEnd;
+    // Decisions (with their arrival pose) not yet followed by another command
+    List<(DecisionCommand, Pose2d?)> unfollowed = [];
+
+    Pose2d? endOf(List<Command> cmds, Pose2d? arrival) {
+      final names = _getPathNamesInCommands(cmds, false);
+      return names.isEmpty ? arrival : ends[names.last]?.end;
+    }
+
+    void walk(List<Command> commands) {
+      for (Command cmd in commands) {
+        // Options followed by more commands must all end at the same pose
+        for (final (decision, arrival) in unfollowed) {
+          Pose2d? defaultEnd = endOf(decision.defaultOptionCommands, arrival);
+          for (DecisionOption option in decision.options) {
+            Pose2d? end = endOf(option.commands, arrival);
+            if (defaultEnd != null &&
+                end != null &&
+                !_samePose(end, defaultEnd)) {
+              warnings.add(
+                  'Decision "${decision.name}": option "${option.name}" does not end where the default option ends');
+            }
+          }
+        }
+        unfollowed.clear();
+
+        if (cmd is PathCommand) {
+          lastEnd = ends[cmd.pathName]?.end ?? lastEnd;
+        } else if (cmd is DecisionCommand) {
+          // With no path before it, the robot starts at the default option's first path
+          final defaultNames =
+              _getPathNamesInCommands(cmd.defaultOptionCommands, false);
+          Pose2d? arrival = lastEnd ??
+              (defaultNames.isEmpty ? null : ends[defaultNames.first]?.start);
+          for (DecisionOption option in cmd.options) {
+            final names = _getPathNamesInCommands(option.commands, false);
+            Pose2d? start = names.isEmpty ? null : ends[names.first]?.start;
+            if (arrival != null &&
+                start != null &&
+                start.translation.getDistance(arrival.translation) >= 0.25) {
+              warnings.add(
+                  'Decision "${cmd.name}": option "${option.name}" does not start where the robot arrives');
+            }
+          }
+          walk(cmd.defaultOptionCommands);
+          unfollowed.add((cmd, arrival));
+        } else if (cmd is CommandGroup) {
+          walk(cmd.commands);
+        }
+      }
+    }
+
+    walk(sequence.commands);
+    return warnings;
+  }
+
+  static bool _samePose(Pose2d a, Pose2d b) {
+    return a.translation.getDistance(b.translation) < 0.25 &&
+        (a.rotation - b.rotation).degrees.abs() < 10;
   }
 
   bool hasEmptyPathCommands() {
@@ -212,13 +286,17 @@ class PathPlannerAuto {
     return false;
   }
 
-  List<String> _getPathNamesInCommands(List<Command> commands) {
+  List<String> _getPathNamesInCommands(
+      List<Command> commands, bool allOptions) {
     List<String> names = [];
     for (Command cmd in commands) {
       if (cmd is PathCommand && cmd.pathName != null) {
         names.add(cmd.pathName!);
+      } else if (cmd is DecisionCommand && !allOptions) {
+        names.addAll(
+            _getPathNamesInCommands(cmd.defaultOptionCommands, allOptions));
       } else if (cmd is CommandGroup) {
-        names.addAll(_getPathNamesInCommands(cmd.commands));
+        names.addAll(_getPathNamesInCommands(cmd.commands, allOptions));
       }
     }
     return names;

@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.CommandUtil;
+import com.pathplanner.lib.auto.Decisions;
 import com.pathplanner.lib.events.*;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
@@ -14,6 +15,7 @@ import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -571,6 +573,7 @@ public class PathPlannerAuto extends Command {
 
   @Override
   public void initialize() {
+    Decisions.clearLocks();
     autoCommand.initialize();
     autoTimer.restart();
 
@@ -690,6 +693,17 @@ public class PathPlannerAuto extends Command {
         || type.equals("deadline")) {
       for (var cmdJson : (JSONArray) data.get("commands")) {
         paths.addAll(pathsFromCommandJson((JSONObject) cmdJson, choreoPaths));
+      }
+    } else if (type.equals("decision")) {
+      // Path lists and the starting pose follow the default option
+      JSONArray options = (JSONArray) data.get("options");
+      if (!options.isEmpty()) {
+        int defaultOption =
+            MathUtil.clamp(((Number) data.get("defaultOption")).intValue(), 0, options.size() - 1);
+        JSONObject option = (JSONObject) options.get(defaultOption);
+        for (var cmdJson : (JSONArray) option.get("commands")) {
+          paths.addAll(pathsFromCommandJson((JSONObject) cmdJson, choreoPaths));
+        }
       }
     }
 

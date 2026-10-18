@@ -63,6 +63,12 @@ class AddCommandButton extends StatelessWidget {
         value: 'race',
         child: Text('Parallel Race Group'),
       ),
+      // Decisions choose between paths, so they only make sense where paths do
+      if (allowPathCommand)
+        const PopupMenuItem(
+          value: 'decision',
+          child: Text('Decision'),
+        ),
     ];
   }
 }

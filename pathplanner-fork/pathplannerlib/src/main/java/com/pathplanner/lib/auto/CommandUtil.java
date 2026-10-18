@@ -1,8 +1,11 @@
 package com.pathplanner.lib.auto;
 
+import com.pathplanner.lib.commands.DecisionCommand;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -50,8 +53,30 @@ public class CommandUtil {
       case "parallel" -> parallelGroupFromData(data, loadChoreoPaths, mirror);
       case "race" -> raceGroupFromData(data, loadChoreoPaths, mirror);
       case "deadline" -> deadlineGroupFromData(data, loadChoreoPaths, mirror);
+      case "decision" -> decisionFromData(data, loadChoreoPaths, mirror);
       default -> Commands.none();
     };
+  }
+
+  private static Command decisionFromData(
+      JSONObject dataJson, boolean loadChoreoPaths, boolean mirror)
+      throws IOException, ParseException {
+    List<String> names = new ArrayList<>();
+    List<Command> options = new ArrayList<>();
+    for (var optionJson : (JSONArray) dataJson.get("options")) {
+      // Each option holds a "commands" list, same as a sequential group's data
+      names.add((String) ((JSONObject) optionJson).get("name"));
+      options.add(sequentialGroupFromData((JSONObject) optionJson, loadChoreoPaths, mirror));
+    }
+    if (options.isEmpty()) {
+      return Commands.none();
+    }
+    return new DecisionCommand(
+        (String) dataJson.get("name"),
+        ((Number) dataJson.get("timeout")).doubleValue(),
+        ((Number) dataJson.get("defaultOption")).intValue(),
+        names,
+        options);
   }
 
   private static Command waitCommandFromData(JSONObject dataJson) {

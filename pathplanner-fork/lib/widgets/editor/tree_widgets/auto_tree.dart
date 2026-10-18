@@ -8,6 +8,7 @@ import 'package:undo/undo.dart';
 class AutoTree extends StatefulWidget {
   final PathPlannerAuto auto;
   final List<String> allPathNames;
+  final List<String> decisionWarnings;
   final ValueChanged<String?>? onPathHovered;
   final VoidCallback? onSideSwapped;
   final VoidCallback? onAutoChanged;
@@ -20,6 +21,7 @@ class AutoTree extends StatefulWidget {
     super.key,
     required this.auto,
     required this.allPathNames,
+    this.decisionWarnings = const [],
     this.onPathHovered,
     this.onSideSwapped,
     this.onAutoChanged,
@@ -80,6 +82,13 @@ class _AutoTreeState extends State<AutoTree> {
           child: SingleChildScrollView(
             child: Column(
               children: [
+                for (String warning in widget.decisionWarnings)
+                  ListTile(
+                    dense: true,
+                    leading: Icon(Icons.warning_amber_rounded,
+                        color: Colors.orange[300]),
+                    title: Text(warning),
+                  ),
                 Card(
                   elevation: 1.0,
                   color: colorScheme.surface,

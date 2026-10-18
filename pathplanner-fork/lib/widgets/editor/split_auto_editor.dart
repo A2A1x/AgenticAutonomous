@@ -21,6 +21,9 @@ class SplitAutoEditor extends StatefulWidget {
   final PathPlannerAuto auto;
   final List<PathPlannerPath> autoPaths;
   final List<ChoreoPath> autoChoreoPaths;
+  final List<PathPlannerPath> fadedPaths;
+  final List<ChoreoPath> fadedChoreoPaths;
+  final List<String> decisionWarnings;
   final List<String> allPathNames;
   final VoidCallback? onAutoChanged;
   final FieldImage fieldImage;
@@ -32,6 +35,9 @@ class SplitAutoEditor extends StatefulWidget {
     required this.auto,
     required this.autoPaths,
     required this.autoChoreoPaths,
+    this.fadedPaths = const [],
+    this.fadedChoreoPaths = const [],
+    this.decisionWarnings = const [],
     required this.allPathNames,
     required this.fieldImage,
     required this.undoStack,
@@ -105,6 +111,8 @@ class _SplitAutoEditorState extends State<SplitAutoEditor>
                             colorScheme: colorScheme,
                             paths: widget.autoPaths,
                             choreoPaths: widget.autoChoreoPaths,
+                            fadedPaths: widget.fadedPaths,
+                            fadedChoreoPaths: widget.fadedChoreoPaths,
                             simple: true,
                             hideOtherPathsOnHover: widget.prefs
                                     .getBool(PrefsKeys.hidePathsOnHover) ??
@@ -167,6 +175,7 @@ class _SplitAutoEditorState extends State<SplitAutoEditor>
                     auto: widget.auto,
                     autoRuntime: _simTraj?.states.last.timeSeconds,
                     allPathNames: widget.allPathNames,
+                    decisionWarnings: widget.decisionWarnings,
                     onRenderAuto: () {
                       if (_simTraj != null) {
                         showDialog(
