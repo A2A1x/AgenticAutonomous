@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rules SYSTEM "https://resources.jetbrains.com/writerside/1.0/redirection-rules.dtd">
+<rules>
+    <!-- format is as follows
+    <rule id="<unique id>">
+        <accepts>page.html</accepts>
+    </rule>
+    -->
+    <rule id="136c9027">
+        <description>Created after removal of "Override PPHolonomicDriveController Feedback" from PathPlanner Docs
+        </description>
+        <accepts>pplib-Override-Target-Rotation.html</accepts>
+    </rule>
+</rules>
