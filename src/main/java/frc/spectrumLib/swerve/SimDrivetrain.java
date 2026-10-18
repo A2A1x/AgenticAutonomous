@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.spectrumLib.swerve.config.ModuleConfig;
 import frc.spectrumLib.swerve.config.SwerveConfig;
@@ -43,8 +44,16 @@ public class SimDrivetrain {
                 double steerInertia,
                 double driveGearing,
                 double driveInertia) {
-            SteerMotor = new DCMotorSim(DCMotor.getFalcon500(1), steerGearing, steerInertia);
-            DriveMotor = new DCMotorSim(DCMotor.getFalcon500(1), driveGearing, driveInertia);
+            SteerMotor =
+                    new DCMotorSim(
+                            LinearSystemId.createDCMotorSystem(
+                                    DCMotor.getFalcon500(1), steerInertia, steerGearing),
+                            DCMotor.getFalcon500(1));
+            DriveMotor =
+                    new DCMotorSim(
+                            LinearSystemId.createDCMotorSystem(
+                                    DCMotor.getFalcon500(1), driveInertia, driveGearing),
+                            DCMotor.getFalcon500(1));
             SteerGearing = steerGearing;
             DriveGearing = driveGearing;
         }

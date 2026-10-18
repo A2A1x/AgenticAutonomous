@@ -21,6 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import frc.robot.RobotTelemetry;
@@ -57,8 +59,8 @@ public class Drivetrain {
     protected Translation2d[] m_moduleLocations;
     protected OdometryThread m_odometryThread;
     protected Rotation2d m_fieldRelativeOffset;
-    protected StatusSignal<Double> m_yawGetter;
-    protected StatusSignal<Double> m_angularZGetter;
+    protected StatusSignal<Angle> m_yawGetter;
+    protected StatusSignal<AngularVelocity> m_angularZGetter;
 
     protected Request m_requestToApply = new Request.Idle();
     protected ControlRequestParameters m_requestParameters = new ControlRequestParameters();
@@ -165,7 +167,8 @@ public class Drivetrain {
                 }
                 // Assume Pigeon2 is flat-and-level so latency compensation can be performed
                 double yawDegrees =
-                        BaseStatusSignal.getLatencyCompensatedValue(m_yawGetter, m_angularZGetter);
+                        BaseStatusSignal.getLatencyCompensatedValueAsDouble(
+                                m_yawGetter, m_angularZGetter);
 
                 /* Keep track of previous and current pose to account for the carpet vector */
                 m_odometry.update(Rotation2d.fromDegrees(yawDegrees), m_modulePositions);
@@ -225,7 +228,7 @@ public class Drivetrain {
     }
 
     protected boolean checkIsOnCanFD(String canbusName) {
-        return CANBus.isNetworkFD(canbusName);
+        return new CANBus(canbusName).isNetworkFD();
     }
 
     /**
@@ -428,7 +431,9 @@ public class Drivetrain {
             m_stateLock.writeLock().lock();
 
             m_odometry.resetPosition(
-                    Rotation2d.fromDegrees(m_yawGetter.getValue()), m_modulePositions, location);
+                    Rotation2d.fromDegrees(m_yawGetter.getValueAsDouble()),
+                    m_modulePositions,
+                    location);
         } finally {
             m_stateLock.writeLock().unlock();
         }

@@ -21,6 +21,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import frc.spectrumLib.swerve.config.ModuleConfig;
 
@@ -38,10 +40,10 @@ public class Module {
     private TalonFX m_steerMotor;
     private CANcoder m_cancoder;
 
-    private StatusSignal<Double> m_drivePosition;
-    private StatusSignal<Double> m_driveVelocity;
-    private StatusSignal<Double> m_steerPosition;
-    private StatusSignal<Double> m_steerVelocity;
+    private StatusSignal<Angle> m_drivePosition;
+    private StatusSignal<AngularVelocity> m_driveVelocity;
+    private StatusSignal<Angle> m_steerPosition;
+    private StatusSignal<AngularVelocity> m_steerVelocity;
     private BaseStatusSignal[] m_signals;
     private double m_driveRotationsPerMeter = 0;
     private double m_couplingRatioDriveRotorToCANcoder;
@@ -76,8 +78,11 @@ public class Module {
         talonConfigs.TorqueCurrent.PeakReverseTorqueCurrent = -config.SlipCurrent;
         talonConfigs.CurrentLimits.StatorCurrentLimit = config.SlipCurrent;
         talonConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonConfigs.CurrentLimits.SupplyCurrentLimit = config.SupplyCurrentLimit;
-        talonConfigs.CurrentLimits.SupplyCurrentThreshold = config.SupplyCurrentThreshold;
+        // Phoenix 2025 dropped the threshold: allow up to it, then hold the limit at once.
+        talonConfigs.CurrentLimits.SupplyCurrentLimit =
+                Math.max(config.SupplyCurrentLimit, config.SupplyCurrentThreshold);
+        talonConfigs.CurrentLimits.SupplyCurrentLowerLimit = config.SupplyCurrentLimit;
+        talonConfigs.CurrentLimits.SupplyCurrentLowerTime = 0;
         talonConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         talonConfigs.MotorOutput.Inverted =
@@ -198,9 +203,11 @@ public class Module {
 
         /* Now latency-compensate our signals */
         double drive_rot =
-                BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveVelocity);
+                BaseStatusSignal.getLatencyCompensatedValueAsDouble(
+                        m_drivePosition, m_driveVelocity);
         double angle_rot =
-                BaseStatusSignal.getLatencyCompensatedValue(m_steerPosition, m_steerVelocity);
+                BaseStatusSignal.getLatencyCompensatedValueAsDouble(
+                        m_steerPosition, m_steerVelocity);
 
         /*
          * Back out the drive rotations based on angle rotations due to coupling between
@@ -227,7 +234,7 @@ public class Module {
 
         /* Back out the expected shimmy the drive motor will see */
         /* Find the angular rate to determine what to back out */
-        double azimuthTurnRps = m_steerVelocity.getValue();
+        double azimuthTurnRps = m_steerVelocity.getValueAsDouble();
         /* Azimuth turn rate multiplied by coupling ratio provides back-out rps */
         double driveRateBackOut = azimuthTurnRps * m_couplingRatioDriveRotorToCANcoder;
 
@@ -238,7 +245,7 @@ public class Module {
 
         /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
         /* To reduce the "skew" that occurs when changing direction */
-        double steerMotorError = angleToSetDeg - m_steerPosition.getValue();
+        double steerMotorError = angleToSetDeg - m_steerPosition.getValueAsDouble();
         // If error is close to 0 rotations, we're already there, so apply full power
         // If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help
         // us at all
@@ -283,8 +290,8 @@ public class Module {
      */
     public SwerveModuleState getCurrentState() {
         return new SwerveModuleState(
-                m_driveVelocity.getValue() / m_driveRotationsPerMeter,
-                Rotation2d.fromRotations(m_steerPosition.getValue()));
+                m_driveVelocity.getValueAsDouble() / m_driveRotationsPerMeter,
+                Rotation2d.fromRotations(m_steerPosition.getValueAsDouble()));
     }
 
     /**

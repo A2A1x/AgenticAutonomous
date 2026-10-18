@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
@@ -42,7 +43,7 @@ public class TalonFXFactory {
     // Create a new follower talon with same configuration as the leader talon
     public static TalonFX createPermanentFollowerTalon(
             CanDeviceId follower_id, TalonFX leaderTalonFX, boolean opposeLeaderDirection) {
-        String leaderCanBus = leaderTalonFX.getNetwork();
+        String leaderCanBus = leaderTalonFX.getNetwork().getName();
         int leaderId = leaderTalonFX.getDeviceID();
         if (!follower_id.getBus().equals(leaderCanBus)) {
             throw new RuntimeException("Master and Slave Talons must be on the same CAN bus");
@@ -52,7 +53,12 @@ public class TalonFXFactory {
         leaderTalonFX.getConfigurator().refresh(followerConfig);
         final TalonFX talon = createConfigTalon(follower_id, followerConfig);
 
-        talon.setControl(new Follower(leaderId, opposeLeaderDirection));
+        talon.setControl(
+                new Follower(
+                        leaderId,
+                        opposeLeaderDirection
+                                ? MotorAlignmentValue.Opposed
+                                : MotorAlignmentValue.Aligned));
         return talon;
     }
 

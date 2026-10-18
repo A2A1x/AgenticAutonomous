@@ -6,6 +6,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -20,11 +21,17 @@ import frc.robot.vision.VisionCommands;
 
 public class AutonCommands {
     public static Command followSinglePath(String PathName) {
-        // Load the path you want to follow using its name in the GUI
-        PathPlannerPath path = PathPlannerPath.fromPathFile(PathName);
+        try {
+            // Load the path you want to follow using its name in the GUI
+            PathPlannerPath path = PathPlannerPath.fromPathFile(PathName);
 
-        // Create a path following command using AutoBuilder. This will also trigger event markers.
-        return AutoBuilder.followPath(path);
+            // Create a path following command using AutoBuilder. This will also trigger event
+            // markers.
+            return AutoBuilder.followPath(path);
+        } catch (Exception e) {
+            DriverStation.reportError("Can't load path " + PathName + ": " + e.getMessage(), false);
+            return Commands.none();
+        }
     }
 
     public static Command pathfindingCommandToPose(
@@ -41,11 +48,7 @@ public class AutonCommands {
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         Command pathfindingCommand =
                 AutoBuilder.pathfindToPoseFlipped(
-                        targetPose,
-                        constraints,
-                        0.0, // Goal end velocity in meters/sec
-                        0.0 // Rotation delay distance in meters. This is how far the robot should
-                        // travel before attempting to rotate.
+                        targetPose, constraints, 0.0 // Goal end velocity in meters/sec
                         );
 
         return pathfindingCommand;

@@ -263,8 +263,10 @@ public abstract class Mechanism implements Subsystem {
 
         public void configSupplyCurrentLimit(
                 double supplyLimit, double supplyThreshold, boolean enabled) {
-            talonConfig.CurrentLimits.SupplyCurrentLimit = supplyLimit;
-            talonConfig.CurrentLimits.SupplyCurrentThreshold = supplyThreshold;
+            // Phoenix 2025 dropped the threshold: allow up to it, then hold the limit at once.
+            talonConfig.CurrentLimits.SupplyCurrentLimit = Math.max(supplyLimit, supplyThreshold);
+            talonConfig.CurrentLimits.SupplyCurrentLowerLimit = supplyLimit;
+            talonConfig.CurrentLimits.SupplyCurrentLowerTime = 0;
             talonConfig.CurrentLimits.SupplyCurrentLimitEnable = enabled;
         }
 
