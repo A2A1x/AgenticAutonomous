@@ -1,0 +1,2 @@
+# The published jars are the point of this folder; the root .gitignore ignores *.jar
+!*.jar

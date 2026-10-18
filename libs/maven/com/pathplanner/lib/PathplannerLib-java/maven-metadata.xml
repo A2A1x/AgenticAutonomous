@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.pathplanner.lib</groupId>
+  <artifactId>PathplannerLib-java</artifactId>
+  <versioning>
+    <latest>2026.1.2-decisions</latest>
+    <release>2026.1.2-decisions</release>
+    <versions>
+      <version>2026.1.2-decisions</version>
+    </versions>
+    <lastUpdated>20261018224934</lastUpdated>
+  </versioning>
+</metadata>
