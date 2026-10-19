@@ -135,6 +135,7 @@ public final class SimRobots {
      * auto.
      */
     public static void start() {
+        int combo = run;
         Random random = new Random(SEED * 1000 + run++);
         String[] autos = new String[robots.size()];
         for (int i = 0; i < robots.size(); i++) {
@@ -152,13 +153,32 @@ public final class SimRobots {
             }
             if (choice == null || RANDOM.equals(choice)) {
                 String[] pool = r.name.endsWith("center") ? CENTER_RANDOM : SOURCE_RANDOM;
-                choice = pool[random.nextInt(pool.length)];
+                choice = COMBOS ? comboPick(combo, i) : pool[random.nextInt(pool.length)];
             }
             autos[i] = choice;
             r.run(choice);
         }
         Logger.recordOutput("Sim/Others/Autos", autos);
         Logger.recordOutput("Sim/Others/Seed", SEED * 1000 + run - 1);
+    }
+
+    /**
+     * UV_SIM_COMBOS=1: run n of a scripted sim plays combination n of the robots' random picks
+     * instead of a random one, blue centre slowest, then red centre, then red source, so 18 runs
+     * cover them all.
+     */
+    private static final boolean COMBOS = "1".equals(System.getenv("UV_SIM_COMBOS"));
+
+    private static String comboPick(int combo, int robot) {
+        int n = combo % (CENTER_RANDOM.length * CENTER_RANDOM.length * SOURCE_RANDOM.length);
+        switch (robot) {
+            case 0:
+                return CENTER_RANDOM[n / (CENTER_RANDOM.length * SOURCE_RANDOM.length)];
+            case 1:
+                return CENTER_RANDOM[(n / SOURCE_RANDOM.length) % CENTER_RANDOM.length];
+            default:
+                return SOURCE_RANDOM[n % SOURCE_RANDOM.length];
+        }
     }
 
     /** Stops every robot and parks it. Call when the robot disables. */
