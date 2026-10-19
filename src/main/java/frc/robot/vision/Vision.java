@@ -515,7 +515,8 @@ public class Vision extends SubsystemBase {
         boolean reject = true;
         boolean firstSuccess = false;
         double batchSize = 5;
-        for (int i = autonPoses.size() - 1; i > autonPoses.size() - (batchSize + 1); i--) {
+        // Stop at 0: with fewer than batchSize poses (no tags seen yet) there's less to try.
+        for (int i = autonPoses.size() - 1; i >= Math.max(0, autonPoses.size() - batchSize); i--) {
             Trio<Pose3d, Pose2d, Double> poseInfo = autonPoses.get(i);
             boolean success =
                     resetPoseToVision(
