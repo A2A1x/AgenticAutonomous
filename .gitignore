@@ -181,3 +181,6 @@ out/
 
 #lock files
 *.lock
+
+# Python bytecode from tools/
+__pycache__/

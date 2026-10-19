@@ -1,0 +1,98 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.85,
+        "y": 4.05
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.85,
+        "y": 4.05
+      },
+      "isLocked": false,
+      "linkedName": "Rush Desicion Point"
+    },
+    {
+      "anchor": {
+        "x": 8.02379194162362,
+        "y": 5.6518981912136015
+      },
+      "prevControl": {
+        "x": 8.407437858186976,
+        "y": 5.3694866498342275
+      },
+      "nextControl": {
+        "x": 7.6420803125033405,
+        "y": 5.932885854285697
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.662288662325669,
+        "y": 4.563346212785141
+      },
+      "prevControl": {
+        "x": 6.31223222711346,
+        "y": 3.46794799549864
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Rush Launch Point"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.002421307506053,
+      "rotationDegrees": -125.68994309644589
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "smartIntake"
+        }
+      }
+    },
+    {
+      "name": "Launch Ready",
+      "waypointRelativePos": 1.3,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "visionLaunchReady"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 6.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 167.02589727076335
+  },
+  "reversed": false,
+  "folder": "Agentic",
+  "idealStartingState": {
+    "velocity": 4.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

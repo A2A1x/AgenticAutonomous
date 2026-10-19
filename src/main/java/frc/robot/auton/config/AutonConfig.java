@@ -3,6 +3,9 @@ package frc.robot.auton.config;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.FlippingUtil;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -11,28 +14,22 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import frc.robot.auton.Auton;
+import frc.robot.sim.SimRobots;
 import frc.robot.swerve.commands.ApplyChassisSpeeds;
 import frc.spectrumLib.swerve.config.ModuleConfig;
+import frc.spectrumLib.swerve.config.SwerveConfig;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class AutonConfig {
 
-    public static final double kTranslationP = 5;
+    public static final double kTranslationP = 8;
     public static final double kTranslationI = 0.0;
     public static final double kTranslationD = 0.0;
-    public static final double kRotationP = 5;
+    public static final double kRotationP = 8;
     public static final double kRotationI = 0.0;
-    public static final double kRotationD = 0.0;
+    public static final double kRotationD = 0.3;
     public static final double maxModuleSpeed = 6;
-
-    /** Estimated: about 125 lb of robot plus bumpers and battery. Weigh the robot to refine it. */
-    public static final double kRobotMassKg = 63.5;
-
-    /** Estimated as a uniform 28 in square of {@link #kRobotMassKg}. */
-    public static final double kRobotMOI = kRobotMassKg * 2 * Math.pow(0.711, 2) / 12;
-
-    /** Rubber-tread default; the 2024 code never measured it. */
-    public static final double kWheelCOF = 1.2;
 
     public static boolean commandInit = false;
 
@@ -43,19 +40,22 @@ public class AutonConfig {
 
     /** PathPlanner's model of Ultraviolet, built from the swerve config it already has. */
     public static com.pathplanner.lib.config.RobotConfig robotConfig() {
-        ModuleConfig[] modules = Robot.swerve.config.modules;
+        SwerveConfig config = Robot.swerve.config;
+        ModuleConfig[] modules = config.modules;
         ModuleConfig module = modules[0];
         Translation2d[] locations = new Translation2d[modules.length];
         for (int i = 0; i < modules.length; i++) {
             locations[i] = new Translation2d(modules[i].LocationX, modules[i].LocationY);
         }
+        // Estimated as a uniform slab the size of the frame, 28 in square.
+        double moi = config.robotMassKg * 2 * Math.pow(0.711, 2) / 12;
         return new com.pathplanner.lib.config.RobotConfig(
-                kRobotMassKg,
-                kRobotMOI,
+                config.robotMassKg,
+                moi,
                 new com.pathplanner.lib.config.ModuleConfig(
                         Units.inchesToMeters(module.WheelRadius),
                         maxModuleSpeed,
-                        kWheelCOF,
+                        config.wheelCOF,
                         // Falcon 500s, matching SimDrivetrain
                         DCMotor.getFalcon500(1).withReduction(module.DriveMotorGearRatio),
                         module.SlipCurrent,
@@ -64,6 +64,25 @@ public class AutonConfig {
     }
 
     public static void configureAutoBuilder() {
+        // CRESCENDO is mirrored, not rotated, and smaller than PathPlanner 2026's default field.
+        FlippingUtil.symmetryType = FlippingUtil.FieldSymmetry.kMirrored;
+        FlippingUtil.fieldSizeX = 16.541;
+        FlippingUtil.fieldSizeY = 8.211;
+
+        PathPlannerLogging.setLogTargetPoseCallback(
+                pose -> {
+                    if (!SimRobots.isMuted()) {
+                        Logger.recordOutput("PathPlanner/TargetPose", pose);
+                    }
+                });
+        PathPlannerLogging.setLogActivePathCallback(
+                poses -> {
+                    if (!SimRobots.isMuted()) {
+                        Logger.recordOutput("PathPlanner/ActivePath", poses.toArray(Pose2d[]::new));
+                        Robot.swerve.getField().getObject("3847 path").setPoses(poses);
+                    }
+                });
+
         // Set the method that will be used to get rotation overrides
         PPHolonomicDriveController.setRotationTargetOverride(() -> getRotationTargetOverride());
 

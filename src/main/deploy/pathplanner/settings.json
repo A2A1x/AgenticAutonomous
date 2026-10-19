@@ -3,10 +3,12 @@
   "robotLength": 0.925,
   "holonomicMode": true,
   "pathFolders": [
-    "Comp"
+    "Comp",
+    "Agentic"
   ],
   "autoFolders": [
-    "Comp"
+    "Comp",
+    "Agentic"
   ],
   "defaultMaxVel": 6.0,
   "defaultMaxAccel": 4.0,

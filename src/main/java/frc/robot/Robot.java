@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.agent.CenterLineMap;
+import frc.robot.agent.Detections;
 import frc.robot.auton.Auton;
 import frc.robot.auton.config.AutonConfig;
 import frc.robot.leds.LEDs;
@@ -33,6 +34,10 @@ import frc.robot.operator.Operator;
 import frc.robot.operator.OperatorCommands;
 import frc.robot.pilot.Pilot;
 import frc.robot.pilot.PilotCommands;
+import frc.robot.sim.RobotSim;
+import frc.robot.sim.SimCamera;
+import frc.robot.sim.SimRobots;
+import frc.robot.sim.SimScript;
 import frc.robot.swerve.Swerve;
 import frc.robot.swerve.commands.SwerveCommands;
 import frc.robot.vision.Vision;
@@ -96,6 +101,10 @@ public class Robot extends LoggedRobot {
 
             /** Set up the config */
             config = new RobotConfig();
+
+            if (isSimulation()) {
+                RobotSim.init(); // the CRESCENDO arena must exist before the drivetrain
+            }
 
             /**
              * Intialize the Subsystems of the robot. Subsystems are how we divide up the robot
@@ -170,6 +179,9 @@ public class Robot extends LoggedRobot {
              * commands, and running subsystem periodic() methods. This must be called from the
              * robot's periodic block in order for anything in the Command-based framework to work.
              */
+            // The centre-line map first, so deciders asked this loop see this frame.
+            // ponytail: no note camera on the real robot yet; it learns only from its own pickups.
+            CenterLineMap.update(isSimulation() ? SimCamera.frame() : Detections.NONE);
             CommandScheduler.getInstance().run();
 
             SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
@@ -186,6 +198,9 @@ public class Robot extends LoggedRobot {
     /** This method is called once when disabled starts */
     public void disabledInit() {
         RobotTelemetry.print("### Disabled Init Starting ### ");
+        if (isSimulation()) {
+            SimRobots.stop();
+        }
 
         resetCommandsAndButtons();
 
@@ -200,7 +215,9 @@ public class Robot extends LoggedRobot {
     }
 
     /** This method is called periodically while disabled. */
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        Auton.seedStartPose();
+    }
 
     /** This method is called once when disabled exits */
     public void disabledExit() {
@@ -225,14 +242,14 @@ public class Robot extends LoggedRobot {
         try {
             RobotTelemetry.print("@@@ Auton Init Starting @@@ ");
             clearCommandsAndButtons();
-            Command autonCommand = Commands.waitSeconds(0.01).andThen(Auton.getAutonomousCommand());
-
-            if (autonCommand != null) {
-                autonCommand.schedule();
-                Auton.startAutonTimer();
-            } else {
-                RobotTelemetry.print("No Auton Command Found");
+            CenterLineMap.reset();
+            if (isSimulation()) {
+                RobotSim.resetForAuto();
+                SimRobots.start();
             }
+            // Scheduled as is, never composed: the chooser hands back the same command every
+            // enable, and a command composed once can't be composed again.
+            Auton.getAutonomousCommand().schedule();
 
             LEDsCommands.countdown(15, 10).schedule();
 
@@ -331,21 +348,24 @@ public class Robot extends LoggedRobot {
     /** This method is called once when a simulation starts */
     public void simulationInit() {
         RobotTelemetry.print("$$$ Simulation Init Starting $$$ ");
+        RobotSim.start();
 
         RobotTelemetry.print("$$$ Simulation Init Complete $$$ ");
     }
 
     /** This method is called periodically during simulation. */
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+        SimScript.periodic();
+        RobotSim.periodic();
+    }
 
     /** This method is called once at the end of RobotInit to begin logging */
     public void advantageKitInit() {
         /* Set up data receivers & replay source */
         Logger.addDataReceiver(new NT4Publisher()); // Running a physics simulator, log to NT
 
-        if (!Robot.isSimulation()) {
-            Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs/"));
-        }
+        Logger.addDataReceiver(
+                new WPILOGWriter(Robot.isSimulation() ? "logs/" : "/home/lvuser/logs/"));
 
         // Start AdvantageKit logger
         Logger.start();

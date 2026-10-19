@@ -1,0 +1,146 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.85,
+        "y": 4.05
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.263859428381108,
+        "y": 4.275804180747435
+      },
+      "isLocked": false,
+      "linkedName": "Rush Desicion Point"
+    },
+    {
+      "anchor": {
+        "x": 6.7298527974539395,
+        "y": 6.411830704456111
+      },
+      "prevControl": {
+        "x": 6.345209031475152,
+        "y": 5.70512347394204
+      },
+      "nextControl": {
+        "x": 7.092703456930092,
+        "y": 7.078497390177824
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.996406986191455,
+        "y": 7.144378262266459
+      },
+      "prevControl": {
+        "x": 8.04951636387421,
+        "y": 7.669570997129245
+      },
+      "nextControl": {
+        "x": 7.934790836469089,
+        "y": 6.5350630039008415
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.96947115748536,
+        "y": 5.870977834670902
+      },
+      "prevControl": {
+        "x": 7.113242173504213,
+        "y": 6.398138226740031
+      },
+      "nextControl": {
+        "x": 6.855670875095069,
+        "y": 5.453710132573168
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.7298527974539395,
+        "y": 4.563346212785141
+      },
+      "prevControl": {
+        "x": 6.859931335756711,
+        "y": 5.20004642658292
+      },
+      "nextControl": {
+        "x": 6.56456343718293,
+        "y": 3.7542982914586123
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.662288662325669,
+        "y": 4.563346212785141
+      },
+      "prevControl": {
+        "x": 5.367451264703853,
+        "y": 4.371651524760003
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Rush Launch Point"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.85,
+      "rotationDegrees": -153.53852544321506
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "smartIntake"
+        }
+      }
+    },
+    {
+      "name": "Launch Ready",
+      "waypointRelativePos": 2.3,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "visionLaunchReady"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 6.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 167.02589727076335
+  },
+  "reversed": false,
+  "folder": "Agentic",
+  "idealStartingState": {
+    "velocity": 4.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
