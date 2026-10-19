@@ -6,6 +6,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +20,7 @@ import frc.spectrumLib.mechanism.TalonFXFactory;
 import frc.spectrumLib.swerve.config.SwerveConfig;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends Mechanism {
     public class PivotConfig extends Config {
@@ -199,7 +202,17 @@ public class Pivot extends Mechanism {
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        // The launcher for AdvantageScope's Ultraviolet model (component 0): it turns about the
+        // pivot shaft, 0.26 m up on the robot's centre line. Not articulated yet, so it sits at the
+        // CAD angle; put the pivot's pitch in the Rotation3d to make it move.
+        Logger.recordOutput(
+                "Mechanism3d/Components",
+                new Pose3d[] {new Pose3d(0, 0, LAUNCHER_PIVOT_HEIGHT_M, new Rotation3d())});
+    }
+
+    /** Height of the launcher's pivot shaft above the floor, m, from the CAD. */
+    private static final double LAUNCHER_PIVOT_HEIGHT_M = 0.26;
 
     // Lookup angle in tree map, add fudge factor, and return angle
     public DoubleSupplier getAngleFromDistance(DoubleSupplier distance) {
