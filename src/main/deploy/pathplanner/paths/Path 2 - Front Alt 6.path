@@ -356,7 +356,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -167.5
   },
   "reversed": false,
   "folder": "Comp",

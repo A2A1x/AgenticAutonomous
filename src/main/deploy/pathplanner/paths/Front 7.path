@@ -132,7 +132,7 @@
   "folder": "Comp",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -167.5
   },
   "useDefaultConstraints": false
 }
