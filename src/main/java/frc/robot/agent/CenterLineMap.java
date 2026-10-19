@@ -22,6 +22,13 @@ public final class CenterLineMap {
     /** How near a detection must be to a spot to count as its note, m. */
     private static final double MATCH_M = 0.6;
 
+    /**
+     * Heading error allowed on top of MATCH_M, deg. Detections are placed from odometry, whose
+     * heading lags a few degrees while the robot spins, and that moves a note 5 m out by most of a
+     * metre: without this, one such frame turns a centre note into a phantom loose note.
+     */
+    private static final double MATCH_HEADING_DEG = 3;
+
     /** Frames in a row a covered spot must look empty before it's called gone. */
     private static final int EMPTY_FRAMES = 5;
 
@@ -123,19 +130,18 @@ public final class CenterLineMap {
     public static void update(Detections frame) {
         double now = Timer.getFPGATimestamp();
         for (int i = 0; i < state.length; i++) {
-            Translation2d spot = spot(i);
             boolean seen = false;
             for (Translation2d n : frame.notes) {
-                seen |= n.getDistance(spot) < MATCH_M;
+                seen |= atSpot(n, i, frame);
             }
             if (seen) {
                 state[i] = State.PRESENT;
                 emptyFrames[i] = 0;
-            } else if (frame.covers(spot) && ++emptyFrames[i] >= EMPTY_FRAMES) {
+            } else if (frame.covers(spot(i)) && ++emptyFrames[i] >= EMPTY_FRAMES) {
                 state[i] = State.GONE;
             }
         }
-        updateLoose(frame.notes, now);
+        updateLoose(frame, now);
         updateRobots(frame.robots, frame.robotsRed, now);
 
         // A note we just picked up near a spot was that spot's note.
@@ -153,13 +159,22 @@ public final class CenterLineMap {
         log(frame);
     }
 
-    private static void updateLoose(List<Translation2d> notes, double now) {
+    /**
+     * Whether detection {@code n} is centre note {@code i}: within MATCH_M of its spot, plus
+     * MATCH_HEADING_DEG's worth at the detection's range.
+     */
+    private static boolean atSpot(Translation2d n, int i, Detections frame) {
+        double range = frame.camera == null ? 0 : n.getDistance(frame.camera.getTranslation());
+        return n.getDistance(spot(i)) < MATCH_M + range * Math.toRadians(MATCH_HEADING_DEG);
+    }
+
+    private static void updateLoose(Detections frame, double now) {
         boolean red = AutoBuilder.shouldFlip();
-        for (Translation2d n : notes) {
+        for (Translation2d n : frame.notes) {
             double x = red ? 2 * CENTER_LINE_X - n.getX() : n.getX();
             boolean atSpot = false;
             for (int i = 0; i < state.length; i++) {
-                atSpot |= n.getDistance(spot(i)) < MATCH_M;
+                atSpot |= atSpot(n, i, frame);
             }
             if (atSpot || x < LOOSE_MIN_X || x > LOOSE_MAX_X) {
                 continue;
