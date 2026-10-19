@@ -3,9 +3,11 @@ package com.pathplanner.lib.auto;
 import com.pathplanner.lib.commands.DecisionCommand;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -107,7 +109,15 @@ public class CommandUtil {
     if (mirror) {
       path = path.mirrorPath();
     }
-    return AutoBuilder.followPath(path);
+    Command follow = AutoBuilder.followPath(path);
+    UnaryOperator<PathPlannerPath> edit = PathEdits.get(pathName);
+    if (edit == null) {
+      return follow;
+    }
+    // Edited paths are built when they start, with the same drive requirements.
+    PathPlannerPath loaded = path;
+    return Commands.defer(
+        () -> AutoBuilder.followPath(edit.apply(loaded)), follow.getRequirements());
   }
 
   private static Command sequentialGroupFromData(
