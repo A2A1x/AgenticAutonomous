@@ -140,6 +140,13 @@ public class LauncherCommands {
                 .withName("Launcher.autoDump");
     }
 
+    public static Command autoDump4() {
+        return runLauncherPercentages(
+                        leftLauncher.config.auto4DumpLauncherPercent,
+                        rightLauncher.config.auto4DumpLauncherPercent)
+                .withName("Launcher.autoDump4");
+    }
+
     public static Command autoDump2() {
         return runLauncherPercentages(
                         leftLauncher.config.auto2DumpLauncherPercent,

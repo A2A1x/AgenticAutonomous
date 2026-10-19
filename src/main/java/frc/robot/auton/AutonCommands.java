@@ -90,6 +90,12 @@ public class AutonCommands {
                 .withName("AutoCommands.spit");
     }
 
+    public static Command spit4() {
+        return LauncherCommands.autoDump4()
+                .alongWith(FeederCommands.autoFeed())
+                .withName("AutoCommands.spit4");
+    }
+
     public static Command spit2() {
         return LauncherCommands.autoDump2()
                 .alongWith(FeederCommands.autoFeed())

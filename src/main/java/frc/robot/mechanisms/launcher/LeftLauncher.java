@@ -31,6 +31,7 @@ public class LeftLauncher extends Mechanism {
         public double dumpLauncherPercent = 0.13;
         public double autoDumpLauncherPercent = 0.07;
         public double auto2DumpLauncherPercent = 0.3;
+        public double auto4DumpLauncherPercent = 0.2; // from TRI, Madtown's preload spit
 
         /* LeftLauncher config values */
         public double currentLimit = 60;
