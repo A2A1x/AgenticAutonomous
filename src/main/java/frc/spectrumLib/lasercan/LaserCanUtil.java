@@ -3,14 +3,25 @@ package frc.spectrumLib.lasercan;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LaserCanUtil {
+    /** Sim only: what each LaserCAN id reads, mm. Ids not set read nothing nearby. */
+    public static final Map<Integer, Integer> simDistanceMm = new HashMap<>();
+
+    private static final int SIM_NOTHING_MM = 1000;
+
     private LaserCan lasercan;
     private int id;
 
     // default constructor
     public LaserCanUtil(int id) {
         this.id = id;
+        if (RobotBase.isSimulation()) {
+            return; // no device to configure; getDistance() reads simDistanceMm
+        }
         lasercan = new LaserCan(id);
         setShortRange();
         setRegionOfInterest(8, 8, 4, 4); // max region
@@ -124,6 +135,9 @@ public class LaserCanUtil {
     }
 
     public int getDistance() {
+        if (RobotBase.isSimulation()) {
+            return simDistanceMm.getOrDefault(id, SIM_NOTHING_MM);
+        }
         LaserCan.Measurement measurement = lasercan.getMeasurement();
         if (measurement != null) {
             if (measurement.status == 0) {

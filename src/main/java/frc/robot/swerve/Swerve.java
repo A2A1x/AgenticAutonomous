@@ -25,6 +25,7 @@ import frc.robot.swerve.configs.ULTRAVIOLET2024;
 import frc.robot.vision.Vision.VisionConfig;
 import frc.spectrumLib.swerve.Drivetrain;
 import frc.spectrumLib.swerve.Drivetrain.DriveState;
+import frc.spectrumLib.swerve.MapleSimDrivetrain;
 import frc.spectrumLib.swerve.Request;
 import frc.spectrumLib.swerve.config.SwerveConfig;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -41,6 +42,12 @@ public class Swerve implements Subsystem {
     private final AlignmentController xController;
     private final AlignmentController yController;
     private Field2d field = new Field2d();
+
+    /** The field widget, for the sim to draw its other robots and notes on. */
+    public Field2d getField() {
+        return field;
+    }
+
     private double OdometryUpdateFrequency = 250;
     private double targetHeading = 0;
     private ReadWriteLock m_stateLock = new ReentrantReadWriteLock();
@@ -151,6 +158,11 @@ public class Swerve implements Subsystem {
         // Update Field object for smartdashboard
         field.setRobotPose(getPose());
         field.getObject("Vision").setPose(Robot.vision.frontLL.getRawPose3d().toPose2d());
+    }
+
+    /** The maple-sim drivetrain in simulation, null on the robot. */
+    public MapleSimDrivetrain getSimDrivetrain() {
+        return drivetrain.getSimDrivetrain();
     }
 
     @Override

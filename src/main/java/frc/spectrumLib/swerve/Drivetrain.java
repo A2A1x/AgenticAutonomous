@@ -24,6 +24,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Threads;
 import frc.robot.RobotTelemetry;
 import frc.spectrumLib.swerve.Request.ControlRequestParameters;
@@ -67,7 +68,9 @@ public class Drivetrain {
 
     protected ReadWriteLock m_stateLock = new ReentrantReadWriteLock();
 
-    protected final SimDrivetrain m_simDrive;
+    /** The maple-sim body in simulation, null on the robot. */
+    protected final MapleSimDrivetrain m_simDrive;
+
     protected final boolean IsOnCANFD;
 
     /**
@@ -286,7 +289,10 @@ public class Drivetrain {
 
         m_fieldRelativeOffset = new Rotation2d();
 
-        m_simDrive = new SimDrivetrain(m_moduleLocations, m_pigeon2, swerveConfig, moduleConfigs);
+        m_simDrive =
+                RobotBase.isSimulation()
+                        ? new MapleSimDrivetrain(swerveConfig, Modules, m_pigeon2)
+                        : null;
 
         m_odometryThread = new OdometryThread();
         RobotTelemetry.print("Starting Odometry Thread: ");
@@ -434,6 +440,10 @@ public class Drivetrain {
                     Rotation2d.fromDegrees(m_yawGetter.getValueAsDouble()),
                     m_modulePositions,
                     location);
+            if (m_simDrive != null) {
+                // In sim a pose reset places the robot, as setting it on the field does.
+                m_simDrive.setPose(location);
+            }
         } finally {
             m_stateLock.writeLock().unlock();
         }
@@ -600,7 +610,12 @@ public class Drivetrain {
      * @param supplyVoltage voltage as seen at the motor controllers
      */
     public void updateSimState(double dtSeconds, double supplyVoltage) {
-        m_simDrive.update(dtSeconds, supplyVoltage, Modules);
+        m_simDrive.update();
+    }
+
+    /** The maple-sim body in simulation, null on the robot. */
+    public MapleSimDrivetrain getSimDrivetrain() {
+        return m_simDrive;
     }
 
     /**

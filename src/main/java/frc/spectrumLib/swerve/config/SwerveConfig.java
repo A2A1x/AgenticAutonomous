@@ -33,6 +33,16 @@ public class SwerveConfig {
     public double deadband = 0; // fractional units 0 - 1
     public double rotationDeadband = 0; // fractionaln units 0 -1
 
+    /* Physical robot, for PathPlanner's model and the sim */
+    /** Estimated: about 125 lb of robot plus bumpers and battery. Weigh the robot to refine it. */
+    public double robotMassKg = 63.5;
+    /** Bumper to bumper, matching the PathPlanner app's robot size. */
+    public double bumperLengthMeters = 0.925;
+
+    public double bumperWidthMeters = 0.925;
+    /** Rubber-tread default; never measured on this robot. */
+    public double wheelCOF = 1.2;
+
     /* Pivot CANCoder config */
     public double pivotCANcoderOffset = 0; // flip sign
     public CANCoderFeedbackType pivotFeedbackSource = CANCoderFeedbackType.FusedCANcoder;

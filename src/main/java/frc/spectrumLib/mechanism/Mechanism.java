@@ -39,6 +39,11 @@ public abstract class Mechanism implements Subsystem {
 
     protected abstract Config setConfig();
 
+    /** The motor, or null when the mechanism isn't attached. */
+    public TalonFX getMotor() {
+        return motor;
+    }
+
     protected void setConfig(Config config) {
         this.config = config;
     };

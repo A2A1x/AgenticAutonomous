@@ -2,11 +2,8 @@
   "HALProvider": {
     "Addressable LEDs": {
       "0": {
-        "columns": 1,
+        "columns": 3,
         "order": 1
-      },
-      "window": {
-        "visible": true
       }
     },
     "Other Devices": {
@@ -79,11 +76,15 @@
         "header": {
           "open": true
         }
+      },
+      "window": {
+        "visible": false
       }
     }
   },
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/PathPlanner": "Alerts",
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
       "/SmartDashboard/Auto Chooser": "String Chooser",
@@ -91,26 +92,23 @@
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
       "/SmartDashboard/Module 3": "Mechanism2d",
-      "/SmartDashboard/Scheduler": "Scheduler"
+      "/SmartDashboard/Odometry/Field": "Field2d",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/Sim Robots/Blue center": "String Chooser",
+      "/SmartDashboard/Sim Robots/Blue source": "String Chooser",
+      "/SmartDashboard/Sim Robots/Red center": "String Chooser",
+      "/SmartDashboard/Sim Robots/Red source": "String Chooser"
     },
     "windows": {
       "/Pose": {
         "bottom": 1476,
+        "builtin": "2024 Crescendo",
         "height": 8.210550308227539,
         "left": 150,
         "right": 2961,
         "top": 79,
         "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Module 0": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Scheduler": {
         "window": {
           "visible": true
         }
@@ -150,5 +148,8 @@
   },
   "NetworkTables Info": {
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
