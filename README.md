@@ -13,6 +13,10 @@ Decision points in autos, tested on Spectrum 3847's 2024 CRESCENDO robot, Ultrav
 Everything runs in simulation: maple-sim physics, with three other simulated Ultraviolets
 running the team's real 2024 autos.
 
+**Write-up:** [a2a1x.github.io/AgenticAutonomous](https://a2a1x.github.io/AgenticAutonomous/)
+covers where the idea came from, the 2026 tests and a replay of every simulated run. The page
+is `docs/index.html`.
+
 The robot code and its history come from
 [Spectrum3847/2024-Ultraviolet](https://github.com/Spectrum3847/2024-Ultraviolet), Spectrum's
 2024 competition software, upgraded here to WPILib 2026.
